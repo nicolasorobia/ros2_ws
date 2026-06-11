@@ -1,3 +1,3 @@
 float64 temperature
-bool are_motors_ready
+bool are_systems_ready
 string debug_message
