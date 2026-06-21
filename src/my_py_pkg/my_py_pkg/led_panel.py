@@ -8,18 +8,23 @@ class LedPanel(Node):
     def __init__(self):
         super().__init__("led_panel")
         self.led_states_ = [0, 0, 0]
+
         self.led_states_pub_ = self.create_publisher(
                                 LedStateArray, "led_panel_state", 10)
+        
+
+        self.set_led_service_ = self.create_service(SetLedState, "set_led", self.callback_set_led)
+
         self.timer_ = self.create_timer(5.0, self.publish_led_states)
         self.get_logger().info("LED panel node initialized...")
 
 
     def publish_led_states(self):
         msg = LedStateArray()
-        msg.led_states = self.led_states
+        msg.led_states = self.led_states_
         self.led_states_pub_.publish(msg)
 
-    def callbac_set_led(self, request: SetLedState.Request, response: SetLedState.Response):
+    def callback_set_led(self, request: SetLedState.Request, response: SetLedState.Response):
         led_number = request.led_number
         state = request.state
 
@@ -32,6 +37,7 @@ class LedPanel(Node):
             return response
         
         self.led_states_[led_number] = state
+        self.publish_led_states()
         response.success = True
         return response
 
